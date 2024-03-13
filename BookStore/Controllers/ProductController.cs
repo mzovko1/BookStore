@@ -1,23 +1,25 @@
 ﻿using BookStore.DataAccess.Data;
 using Microsoft.AspNetCore.Mvc;
 using BookStore.Models.Models;
+using BookStore.DataAccess.Repository.IRepository;
 
 namespace BookStore.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        public ProductController(ApplicationDbContext context)
+        private readonly IUnitOfWork _unitOfWork;
+
+
+        public ProductController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            List<Category> categoryList = _context.Categories.ToList();
-            List<Product> productList = _context.Products.ToList();
+            List<Product> productList = _unitOfWork.Product.GetAll().ToList();
             return View(productList);
-           
         }
+
         public IActionResult Create()
         {
             return View();
@@ -25,11 +27,10 @@ namespace BookStore.Controllers
         [HttpPost]
         public IActionResult Create(Product product)
         {
-            
             if (ModelState.IsValid)
             {
-                _context.Products.Add(product);
-                _context.SaveChanges();
+                _unitOfWork.Product.Add(product);
+                _unitOfWork.Save();
                 TempData["success"] = "Product created sucessfully!";
                 return RedirectToAction("Index", "Product");
             }
@@ -41,7 +42,7 @@ namespace BookStore.Controllers
             {
                 return NotFound();
             }
-            Product? product = _context.Products.FirstOrDefault(c => c.Id == productId);
+            Product? product = _unitOfWork.Product.Get(c => c.Id == productId);
 
             if (product == null)
             {
@@ -54,20 +55,21 @@ namespace BookStore.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Products.Update(product);
-                _context.SaveChanges();
+                _unitOfWork.Product.Update(product);
+                _unitOfWork.Save();
                 TempData["success"] = "Product edited sucessfully!";
                 return RedirectToAction("Index", "Product");
             }
             return View();
         }
+
         public IActionResult Delete(int? productId)
         {
             if (productId == null || productId == 0)
             {
                 return NotFound();
             }
-            Product? product = _context.Products.FirstOrDefault(c => c.Id == productId);
+            Product? product = _unitOfWork.Product.Get(c => c.Id == productId);
 
             if (product == null)
             {
@@ -78,14 +80,14 @@ namespace BookStore.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(int? productId)
         {
-            Product? product = _context.Products.FirstOrDefault(c => c.Id == productId);
+            Product? product = _unitOfWork.Product.Get(c => c.Id == productId);
             if (product == null)
             {
                 return NotFound();
             }
 
-            _context.Products.Remove(product);
-            _context.SaveChanges();
+            _unitOfWork.Product.Delete(product);
+            _unitOfWork.Save();
             TempData["success"] = "Product deleted sucessfully!";
             return RedirectToAction("Index", "Product");
 
