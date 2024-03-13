@@ -1,0 +1,58 @@
+﻿@model List<Product>
+
+@if (TempData["success"] != null)
+{
+    <p>@TempData["success"]</p>
+}
+
+<div class="container">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Products list</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Product" asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>Create new product
+            </a>
+        </div>
+    </div>
+</div>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Author</th>
+            <th>Description</th>
+            <th>Year Of Publish</th>
+            <th>Price</th>
+            <th>Picture</th>
+            <th>Category</th>
+            <th>Number Of Pages</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Name </td>
+                <td>@product.Author</td>
+                <td>@product.Description</td>
+                <td>@product.YearOfPublish</td>
+                <td>@product.Price</td>
+                <td>@product.Picture</td>
+                <td>@product.Category</td>
+                <td>@product.NumberOfPages</td>
+                    <div class="w-75 btn-group" role="group">
+                        <a asp-controller="Product" asp-action="Edit" asp-route-categoryId="@product.Id" class="btn mx-2">
+                            <i class="bi bi-pencil-square"></i>
+                            Edit
+                        </a>
+                        <a asp-controller="Product" asp-action="Delete" asp-route-categoryId="@product.Id" class="btn mx-2">
+                            <i class="bi bi-trash3"></i>
+                            Delete
+                        </a>
+                    </div>
+            </tr>
+        }
+    </tbody>
+</table>
