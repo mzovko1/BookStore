@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using BookStore.DataAccess.Data;
 using BookStore.DataAccess.Repository.IRepository;
 
-namespace BookStore.Controllers
+namespace BookStore.Areas.Admin.Controllers
 {
     public class CategoryController : Controller
     {
@@ -20,14 +20,14 @@ namespace BookStore.Controllers
 
         public CategoryController(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;  
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            List<Category> categoryList= _unitOfWork.Category.GetAll().ToList();
+            List<Category> categoryList = _unitOfWork.Category.GetAll().ToList();
             return View(categoryList);
         }
-        
+
         public IActionResult Create()
         {
             return View();
@@ -43,18 +43,18 @@ namespace BookStore.Controllers
             {
                 ModelState.AddModelError("Name", "The display order can't be the same as the name");
             }
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _unitOfWork.Category.Add(category);
                 _unitOfWork.Save();
                 TempData["success"] = "Category created sucessfully!";
-                return RedirectToAction("Index","Category");
+                return RedirectToAction("Index", "Category");
             }
             return View();
         }
         public IActionResult Edit(int? categoryId)
         {
-            if(categoryId==null || categoryId==0)
+            if (categoryId == null || categoryId == 0)
             {
                 return NotFound();
             }
@@ -62,7 +62,7 @@ namespace BookStore.Controllers
             //Category? category1 = _context.Categories.Find(categoryId);
             //Category? category2 = _context.Categories.Where(c => c.Id == categoryId).FirstOrDefault();
 
-            if (category==null)
+            if (category == null)
             {
                 return NotFound();
             }
@@ -71,12 +71,12 @@ namespace BookStore.Controllers
         [HttpPost]
         public IActionResult Edit(Category category)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _unitOfWork.Category.Update(category);
                 _unitOfWork.Save();
                 TempData["success"] = "Category edited sucessfully!";
-                return RedirectToAction("Index","Category");
+                return RedirectToAction("Index", "Category");
             }
             return View();
         }
@@ -104,11 +104,11 @@ namespace BookStore.Controllers
                 return NotFound();
             }
 
-                _unitOfWork.Category.Delete(category);
-                _unitOfWork.Save();
-                TempData["success"] = "Category deleted sucessfully!";
-                return RedirectToAction("Index", "Category");
-            
+            _unitOfWork.Category.Delete(category);
+            _unitOfWork.Save();
+            TempData["success"] = "Category deleted sucessfully!";
+            return RedirectToAction("Index", "Category");
+
         }
 
     }

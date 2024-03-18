@@ -30,7 +30,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"); //Home/Privacy
+    pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}"); //Home/Privacy
 
 app.Run();
  
