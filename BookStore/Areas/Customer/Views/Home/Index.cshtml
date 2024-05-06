@@ -7,7 +7,7 @@
         <div class="row p-2">
             <div class="col-12 p-1">
                 <div class="card border-0 p-3 shadow-top border-5 rounded">
-                    <img src="@product.ImageUrl" class="card-img-top rounded" />
+                        <img src="@product.ImageUrl" class="card-img-top rounded" width="400" height="350" />
                     <div class="card-body pb-0">
                         <div class="pl-1">
                             <p class="card-title h5 text-dark opacity-75 text-uppercase text-center">@product.Title</p>
@@ -15,13 +15,13 @@
                         </div>
                         <div class="pl-1">
                             <p class="card-title h5 text-dark text-opacity-75 text-uppercase text-center mb-0">
-                                List Price:
+                                Price:
                                 <span class="text-decoration-line-through">
                                     @product.ListPrice.ToString("c")
                                 </span>
                             </p>
                             <p class="card-title h5 text-dark text-opacity-75 text-uppercase text-center mb-0">
-                                As low as:
+                                Discount price:
                                     <span>
                                     @product.Price100.ToString("c")
                                 </span>

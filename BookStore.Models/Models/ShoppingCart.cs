@@ -13,7 +13,6 @@ namespace BookStore.Models.Models;
 
 public class ShoppingCart
 {
-    [Key]
     public int Id {  get; set; }
     public int Count { get; set; }
     public int ProductId { get; set; }
@@ -24,6 +23,7 @@ public class ShoppingCart
     [ForeignKey("ApplicationUserId")]
     [ValidateNever]
     public ApplicationUser ApplicationUser { get; set; }
-
+    [NotMapped]
+    public double Price {  get; set; }
 
 }

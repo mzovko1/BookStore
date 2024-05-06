@@ -5,9 +5,12 @@ using BookStore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace BookShop.Areas.Admin.Controllers;
+namespace BookStore.Areas.Admin.Controllers;
+using BookStore.Utility;
+using Microsoft.AspNetCore.Authorization;
 
 [Area("Admin")]
+[Authorize(Roles = Role.Role_Admin)]
 public class ProductController : Controller
 {
     //private readonly ApplicationDbContext _context;

@@ -4,10 +4,13 @@ using BookStore.Models.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using BookStore.Utility;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookStore.Areas.Admin.Controllers;
 
 [Area("Admin")]
+[Authorize(Roles = Role.Role_Admin)]
 public class CompanyController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
