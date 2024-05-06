@@ -84,7 +84,6 @@ public class ShoppingCartController : Controller
         ShoppingCartViewModel.OrderHeader.OrderDate = DateTime.Now;
         ShoppingCartViewModel.OrderHeader.ApplicationUserId = userId;
 
-        // Changed to this because of key constraint
         ApplicationUser applicationUser = _unitOfWork.ApplicationUser.Get(au => au.Id == userId);
 
 
@@ -96,13 +95,11 @@ public class ShoppingCartController : Controller
 
         if (applicationUser.CompanyId.GetValueOrDefault() == 0)
         {
-            // Customer account
             ShoppingCartViewModel.OrderHeader.PaymentStatus = PaymentStatus.Pending;
             ShoppingCartViewModel.OrderHeader.OrderStatus = OrderStatus.Pending;
         }
         else
         {
-            // Company account
             ShoppingCartViewModel.OrderHeader.PaymentStatus = PaymentStatus.Delayed;
             ShoppingCartViewModel.OrderHeader.OrderStatus = OrderStatus.Approved;
         }
