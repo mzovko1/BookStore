@@ -5,6 +5,12 @@ using Microsoft.AspNetCore.Authorization;
 using BookStore.Models.Models;
 using System.Security.Claims;
 using BookStore.Utility;
+using Stripe.BillingPortal;
+using Stripe.Checkout;
+using Stripe.Tax;
+using SessionService = Stripe.Checkout.SessionService;
+using Session = Stripe.Checkout.Session;
+using SessionCreateOptions = Stripe.Checkout.SessionCreateOptions;
 
 namespace BookStore.Areas.Customer.Controllers;
 
@@ -123,7 +129,39 @@ public class ShoppingCartController : Controller
 
         if (applicationUser.CompanyId.GetValueOrDefault() == 0)
         {
-            // Customer account - make payment
+            var domain = "https://localhost:7101/";
+            var options = new SessionCreateOptions
+            {
+                SuccessUrl = domain + $"customer/shoppingcart/OrderConfirmation?id={ShoppingCartViewModel.OrderHeader.Id}",
+                CancelUrl = domain + $"customer/shoppingcart/index",
+                LineItems = new List<SessionLineItemOptions>(),
+                Mode = "payment",
+            };
+
+            foreach(var item in ShoppingCartViewModel.ShoppingCartList)
+            {
+                var sessionLineItem = new SessionLineItemOptions()
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        UnitAmount = (long)(item.Price * 100),
+                        Currency = "eur",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions()
+                        {
+                            Name = item.Product.Title,
+                        }
+                    },
+                    Quantity = item.Count
+                };
+                options.LineItems.Add(sessionLineItem);
+            }
+            var service = new SessionService();
+            Session session=service.Create(options);
+
+            _unitOfWork.OrderHeader.UpdateStripePaymentId(ShoppingCartViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
+            _unitOfWork.Save();
+            Response.Headers.Add("Location", session.Url);
+            return new StatusCodeResult(303);
         }
 
         // Call OrderConfirmation with the id equal to =>
@@ -132,6 +170,20 @@ public class ShoppingCartController : Controller
 
     public IActionResult OrderConfirmation(int id)
     {
+        OrderHeader orderHeader=_unitOfWork.OrderHeader.Get(oh=>oh.Id== id, includeProperties:"ApplicationUser");
+
+        if(orderHeader.PaymentStatus!=PaymentStatus.Delayed)
+        {
+            var sessionService=new SessionService();
+            Session session = sessionService.Get(orderHeader.SessionId);
+
+            if (session.PaymentStatus.ToLower() == "paid")
+            {
+                _unitOfWork.OrderHeader.UpdateStripePaymentId(id, session.Id, session.PaymentIntentId);
+                _unitOfWork.OrderHeader.UpdateStatus(id, OrderStatus.Approved, PaymentStatus.Approved);
+                _unitOfWork.Save();
+            }
+        }
         return View(id);
     }
 
